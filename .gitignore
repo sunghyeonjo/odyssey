@@ -1,0 +1,14 @@
+application-local.yml
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+.idea/
+.vscode/
+*.iml
+build/
+target/
+.gradle/
+.kotlin/
