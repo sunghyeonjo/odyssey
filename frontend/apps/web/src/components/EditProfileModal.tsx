@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -16,7 +16,6 @@ interface EditProfileModalProps {
 export default function EditProfileModal({ currentBio, currentNickname, onClose }: EditProfileModalProps) {
   const [bio, setBio] = useState(currentBio ?? '')
   const [nickname, setNickname] = useState(currentNickname)
-  const queryClient = useQueryClient()
   const { updateUser } = useAuth()
 
   useEffect(() => {
@@ -36,11 +35,7 @@ export default function EditProfileModal({ currentBio, currentNickname, onClose 
       })
     },
     onSuccess: () => {
-      const trimmedNickname = nickname.trim()
-      if (trimmedNickname !== currentNickname) {
-        updateUser({ nickname: trimmedNickname })
-      }
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] })
+      updateUser({ nickname: nickname.trim(), bio: bio.trim() || null })
       onClose()
     },
   })

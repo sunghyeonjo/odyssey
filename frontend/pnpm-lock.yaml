@@ -10,7 +10,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@buffett-diary/shared':
+      '@odyssey/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@tanstack/react-query':

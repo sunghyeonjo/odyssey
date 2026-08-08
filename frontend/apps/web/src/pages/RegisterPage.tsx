@@ -88,7 +88,6 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center pb-2">
-          <img src="/logo.svg" alt="dayed" className="h-12 w-12 mb-2" />
           <h1 className="text-2xl font-bold">회원가입</h1>
           <div className="flex items-center gap-2 mt-2">
             {stepLabels.map((label, i) => (

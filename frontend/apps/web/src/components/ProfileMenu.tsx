@@ -54,7 +54,7 @@ export default function ProfileMenu() {
           </div>
           <div className="p-1">
             <button
-              onClick={() => { setOpen(false); navigate('/mypage') }}
+              onClick={() => { setOpen(false); navigate('/') }}
               className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent"
             >
               <User className="h-4 w-4 text-muted-foreground" />

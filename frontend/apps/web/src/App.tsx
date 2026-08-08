@@ -6,10 +6,6 @@ import Layout from '@/components/Layout'
 import LoginPage from '@/pages/LoginPage'
 import RegisterPage from '@/pages/RegisterPage'
 import OAuthCallbackPage from '@/pages/OAuthCallbackPage'
-import FeedPage from '@/pages/FeedPage'
-import TradeListPage from '@/pages/TradeListPage'
-import JournalListPage from '@/pages/JournalListPage'
-import UserProfilePage from '@/pages/UserProfilePage'
 import MyPage from '@/pages/MyPage'
 
 const queryClient = new QueryClient({
@@ -34,11 +30,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             >
-              <Route path="/" element={<FeedPage />} />
-              <Route path="/trades" element={<TradeListPage />} />
-              <Route path="/journals" element={<JournalListPage />} />
-              <Route path="/mypage" element={<MyPage />} />
-              <Route path="/users/:userId" element={<UserProfilePage />} />
+              <Route path="/" element={<MyPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

@@ -1,4 +1,4 @@
-import type { AuthResponse, LoginRequest, RegisterRequest, SendCodeRequest, VerifyCodeRequest } from '@buffett-diary/shared'
+import type { AuthResponse, LoginRequest, RegisterRequest, SendCodeRequest, VerifyCodeRequest } from '@odyssey/shared'
 import client from './client'
 
 export const authApi = {

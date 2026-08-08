@@ -41,8 +41,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center pb-2">
-          <img src="/logo.svg" alt="dayed" className="h-12 w-12 mb-2" />
-          <h1 className="text-2xl font-bold">dayed</h1>
+          <h1 className="text-2xl font-bold">odyssey</h1>
           <p className="text-sm text-muted-foreground">로그인하세요</p>
         </CardHeader>
         <CardContent className="space-y-4">

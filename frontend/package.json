@@ -1,5 +1,5 @@
 {
-  "name": "buffett-diary-frontend",
+  "name": "odyssey-frontend",
   "private": true,
   "scripts": {
     "dev": "pnpm --filter web dev",

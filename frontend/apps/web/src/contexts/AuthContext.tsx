@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
-import type { User } from '@buffett-diary/shared'
+import type { User } from '@odyssey/shared'
 import { authApi } from '@/api/auth'
 
 interface AuthContextType {
