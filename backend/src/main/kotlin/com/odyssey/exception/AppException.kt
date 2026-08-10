@@ -1,5 +1,3 @@
-
-
 package com.odyssey.exception
 
 import org.springframework.http.HttpStatus

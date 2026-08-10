@@ -45,6 +45,11 @@ frontend:
 resend:
   api-key: ${RESEND_API_KEY:}
 
+auth:
+  # false 면 인증 메일을 보내지 않고 고정 코드(000000)를 씀. 로컬 개발 전용.
+  # 기본값 true — 설정을 빠뜨려도 운영에서 인증이 열리지 않도록 함
+  email-verification: ${AUTH_EMAIL_VERIFICATION:true}
+
 jwt:
   secret: ${JWT_SECRET:jwt-secret-key-for-local-development-only}
   access-expiration: 1800000   # 30 minutes

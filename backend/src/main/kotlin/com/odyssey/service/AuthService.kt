@@ -8,6 +8,8 @@ import com.odyssey.exception.*
 import com.odyssey.repository.RefreshTokenRepository
 import com.odyssey.repository.UserRepository
 import com.odyssey.security.JwtUtil
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -24,7 +26,11 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val redisTemplate: StringRedisTemplate,
     private val emailService: EmailService,
+    /** 로컬 개발에서만 false. 기본값 true 라 설정을 빠뜨려도 운영은 안전함 */
+    @Value("\${auth.email-verification}") private val emailVerificationEnabled: Boolean,
 ) {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     fun sendVerificationCode(email: String) {
         if (userRepository.existsByEmail(email)) {
             throw ConflictException("이미 사용 중인 이메일입니다")
@@ -34,11 +40,21 @@ class AuthService(
         if (redisTemplate.hasKey(cooldownKey)) {
             throw RateLimitException("잠시 후 다시 시도해주세요 (60초 제한)")
         }
-        val code = "%06d".format(SecureRandom().nextInt(1_000_000))
+        val code = if (emailVerificationEnabled) {
+            "%06d".format(SecureRandom().nextInt(1_000_000))
+        } else {
+            DEV_VERIFICATION_CODE
+        }
         redisTemplate.opsForValue().set("verify:code:$email", code, Duration.ofMinutes(5))
         redisTemplate.delete("verify:attempts:$email")
         redisTemplate.opsForValue().set(cooldownKey, "1", Duration.ofSeconds(60))
-        emailService.sendVerificationCode(email, code)
+
+        if (emailVerificationEnabled) {
+            emailService.sendVerificationCode(email, code)
+        } else {
+            // 검증 로직(만료·시도 제한·confirmed 플래그)은 그대로 두고 전달 수단만 바꿈
+            log.warn("이메일 인증 발송이 비활성화됨. {} 의 인증 코드는 {} 입니다", email, code)
+        }
     }
 
     fun verifyCode(email: String, code: String) {
@@ -139,9 +155,7 @@ class AuthService(
     }
 
     @Transactional(readOnly = true)
-    fun isNicknameTaken(nickname: String): Boolean {
-        return userRepository.existsByNickname(nickname)
-    }
+    fun isNicknameTaken(nickname: String): Boolean = userRepository.existsByNickname(nickname)
 
     private fun validatePassword(password: String) {
         if (password.length < 8 || password.length > 72) {
@@ -189,5 +203,10 @@ class AuthService(
                 createdAt = user.createdAt.toString(),
             ),
         )
+    }
+
+    companion object {
+        /** 이메일 발송을 끈 환경에서 쓰는 고정 코드 */
+        private const val DEV_VERIFICATION_CODE = "000000"
     }
 }

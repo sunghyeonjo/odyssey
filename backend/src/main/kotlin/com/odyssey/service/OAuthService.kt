@@ -64,12 +64,11 @@ class OAuthService(
         return OAuthTokenResponse(accessToken)
     }
 
-    private fun fetchUserInfo(provider: String, accessToken: String): OAuthUserInfo {
-        return when (provider) {
+    private fun fetchUserInfo(provider: String, accessToken: String): OAuthUserInfo =
+        when (provider) {
             "google" -> fetchGoogleUserInfo(accessToken)
             else -> throw BadRequestException("Unsupported provider: $provider")
         }
-    }
 
     private fun fetchGoogleUserInfo(accessToken: String): OAuthUserInfo {
         val headers = HttpHeaders().apply { setBearerAuth(accessToken) }

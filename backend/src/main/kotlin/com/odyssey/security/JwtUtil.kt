@@ -22,13 +22,11 @@ class JwtUtil(
         Keys.hmacShaKeyFor(secret.toByteArray())
     }
 
-    fun generateAccessToken(userId: Long, email: String): String {
-        return generateToken(userId, email, accessExpiration)
-    }
+    fun generateAccessToken(userId: Long, email: String): String =
+        generateToken(userId = userId, email = email, expiration = accessExpiration)
 
-    fun generateRefreshToken(userId: Long, email: String): String {
-        return generateToken(userId, email, refreshExpiration)
-    }
+    fun generateRefreshToken(userId: Long, email: String): String =
+        generateToken(userId = userId, email = email, expiration = refreshExpiration)
 
     fun getRefreshExpirationMs(): Long = refreshExpiration
 
@@ -43,24 +41,20 @@ class JwtUtil(
             .compact()
     }
 
-    fun getUserIdFromToken(token: String): Long {
-        return getClaims(token).subject.toLong()
-    }
+    fun getUserIdFromToken(token: String): Long = getClaims(token).subject.toLong()
 
-    fun validateToken(token: String): Boolean {
-        return try {
-            getClaims(token)
-            true
-        } catch (e: ExpiredJwtException) {
-            log.debug("JWT expired")
-            false
-        } catch (e: JwtException) {
-            log.debug("JWT invalid: {}", e.message)
-            false
-        } catch (e: Exception) {
-            log.warn("Unexpected error validating JWT: {}", e.message)
-            false
-        }
+    fun validateToken(token: String): Boolean = try {
+        getClaims(token)
+        true
+    } catch (e: ExpiredJwtException) {
+        log.debug("JWT expired")
+        false
+    } catch (e: JwtException) {
+        log.debug("JWT invalid: {}", e.message)
+        false
+    } catch (e: Exception) {
+        log.warn("Unexpected error validating JWT: {}", e.message)
+        false
     }
 
     private fun getClaims(token: String) =

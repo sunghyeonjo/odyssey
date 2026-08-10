@@ -15,7 +15,7 @@ class UserService(
     fun search(query: String, page: Int, size: Int): PageResponse<UserSearchResponse> {
         val result = userRepository.findByNicknameContainingIgnoreCase(query, PageRequest.of(page, size))
         return PageResponse(
-            content = result.content.map { UserSearchResponse(it.id, it.nickname, it.bio) },
+            content = result.content.map { UserSearchResponse(id = it.id, nickname = it.nickname, bio = it.bio) },
             totalElements = result.totalElements,
             totalPages = result.totalPages,
             page = page,

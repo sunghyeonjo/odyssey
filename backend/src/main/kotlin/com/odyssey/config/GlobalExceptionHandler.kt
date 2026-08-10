@@ -18,9 +18,8 @@ class GlobalExceptionHandler {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @ExceptionHandler(AppException::class)
-    fun handleAppException(e: AppException): ResponseEntity<ErrorResponse> {
-        return ResponseEntity.status(e.status).body(ErrorResponse(e.message ?: "Error"))
-    }
+    fun handleAppException(e: AppException): ResponseEntity<ErrorResponse> =
+        ResponseEntity.status(e.status).body(ErrorResponse(e.message ?: "Error"))
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidation(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
@@ -29,14 +28,12 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DateTimeParseException::class)
-    fun handleDateTimeParse(e: DateTimeParseException): ResponseEntity<ErrorResponse> {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse("Invalid date format"))
-    }
+    fun handleDateTimeParse(e: DateTimeParseException): ResponseEntity<ErrorResponse> =
+        ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse("Invalid date format"))
 
     @ExceptionHandler(DataIntegrityViolationException::class)
-    fun handleDataIntegrity(e: DataIntegrityViolationException): ResponseEntity<ErrorResponse> {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponse("Data integrity violation"))
-    }
+    fun handleDataIntegrity(e: DataIntegrityViolationException): ResponseEntity<ErrorResponse> =
+        ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponse("Data integrity violation"))
 
     @ExceptionHandler(Exception::class)
     fun handleUnexpected(e: Exception): ResponseEntity<ErrorResponse> {
