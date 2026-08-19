@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneThing — 마음이 자라는 정원</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fef9f0; --card:#ffffff; --ink:#4a4038; --sub:#9a8f80; --line:#efe6d6;
+    --accent:#7bab5a;         /* 잎 초록 */
+    --accent-deep:#5d9145;
+    --soft:#eaf4e1;
+    --pink:#f6b8c4; --sun:#ffd98a; --sky1:#bfe6ff; --sky2:#e8f6e6;
+    --shadow:0 8px 22px rgba(120,100,70,.10);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#f3ead9;font-family:'Jua',sans-serif;color:var(--ink)}
+  body{display:flex;justify-content:center;min-height:100vh}
+  ::-webkit-scrollbar{width:0}
+  .hand{font-family:'Gaegu',cursive}
+
+  .phone{position:relative;width:100%;max-width:414px;min-height:100vh;background:var(--bg);overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.15)}
+  .screen{padding:20px 18px 110px}
+
+  /* ---- 상단 상태바 ---- */
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .topbar .title{font-size:22px}
+  .topbar .title small{font-family:'Gaegu';font-size:14px;color:var(--sub);display:block;margin-top:-2px}
+  .season{display:flex;gap:6px;align-items:center;background:#fff;border:1px solid var(--line);
+    border-radius:999px;padding:6px 12px;font-size:13px;box-shadow:var(--shadow)}
+
+  /* ---- 정원 씬 ---- */
+  .garden{position:relative;height:340px;border-radius:26px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:12px;
+    background:linear-gradient(#bfe6ff 0%, #d9f0ec 42%, #eaf7dd 62%, #dff0c6 100%)}
+  .sun{position:absolute;top:18px;right:22px;width:46px;height:46px;border-radius:50%;
+    background:radial-gradient(circle,#fff2c4,#ffd471);box-shadow:0 0 30px rgba(255,205,110,.7)}
+  .cloud{position:absolute;background:#fff;border-radius:999px;opacity:.9}
+  .cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+  .c1{top:34px;left:26px;width:52px;height:18px}
+  .c1::before{width:26px;height:26px;top:-12px;left:8px}.c1::after{width:20px;height:20px;top:-9px;left:28px}
+  .c2{top:64px;left:250px;width:40px;height:14px;opacity:.8}
+  .c2::before{width:20px;height:20px;top:-9px;left:6px}.c2::after{width:16px;height:16px;top:-7px;left:20px}
+  /* 언덕 레이어 */
+  .hill{position:absolute;border-radius:50%}
+  .h1{width:150%;height:200px;left:-25%;bottom:-90px;background:#bfe08f}
+  .h2{width:120%;height:170px;right:-30%;bottom:-80px;background:#a9d47a}
+  .h3{width:150%;height:150px;left:-20%;bottom:-70px;background:#95c869}
+  .ground{position:absolute;left:0;right:0;bottom:0;height:120px;background:#8dc25f}
+  .path{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:120px;height:150px;
+    background:#f0e2bf;border-radius:50%;opacity:.85}
+
+  .plant{position:absolute;font-size:30px;cursor:pointer;transform-origin:bottom center;
+    animation:sway 4s ease-in-out infinite;filter:drop-shadow(0 3px 2px rgba(0,0,0,.12))}
+  @keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+  .plant:active{transform:scale(1.25)}
+  .deco{position:absolute;font-size:20px;filter:drop-shadow(0 2px 1px rgba(0,0,0,.1))}
+
+  /* 마스코트 */
+  .mascot{position:absolute;left:44%;bottom:38px;width:56px;height:62px;z-index:3;animation:hop 3s ease-in-out infinite}
+  @keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  .mascot .hood{position:absolute;inset:0 0 6px 0;background:var(--accent);border-radius:28px 28px 24px 24px}
+  .mascot .face{position:absolute;left:8px;right:8px;top:14px;bottom:12px;background:#fff6e9;border-radius:20px}
+  .mascot .eye{position:absolute;top:14px;width:5px;height:7px;border-radius:3px;background:#4a4038}
+  .mascot .eye.l{left:11px}.mascot .eye.r{right:11px}
+  .mascot .cheek{position:absolute;top:22px;width:7px;height:5px;border-radius:3px;background:#ffb3ba}
+  .mascot .cheek.l{left:7px}.mascot .cheek.r{right:7px}
+  .mascot .can{position:absolute;right:-10px;top:24px;font-size:18px;transform:rotate(15deg)}
+
+  /* ---- 오늘 카드 (물주기) ---- */
+  .today{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:20px;padding:14px 16px;
+    box-shadow:var(--shadow);margin-bottom:22px;border:1px solid var(--line)}
+  .today .drop{width:46px;height:46px;border-radius:16px;background:var(--soft);display:grid;place-items:center;font-size:22px}
+  .today .t{flex:1}
+  .today .t b{font-size:15px}.today .t p{font-family:'Gaegu';font-size:14px;color:var(--sub);margin-top:1px}
+  .today button{background:var(--accent);color:#fff;border:none;border-radius:14px;padding:11px 16px;font-family:'Jua';font-size:14px;cursor:pointer;box-shadow:0 4px 0 var(--accent-deep)}
+  .today button:active{transform:translateY(2px);box-shadow:0 2px 0 var(--accent-deep)}
+
+  /* ---- 섹션 헤더 ---- */
+  .sec{display:flex;justify-content:space-between;align-items:center;margin:0 2px 12px}
+  .sec h2{font-size:17px}
+  .sec .more{font-family:'Gaegu';font-size:14px;color:var(--accent-deep);cursor:pointer}
+
+  /* ---- 이웃 마을 ---- */
+  .village{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 8px;margin-bottom:8px}
+  .nb{flex:0 0 128px;background:var(--card);border-radius:20px;border:1px solid var(--line);overflow:hidden;box-shadow:var(--shadow);cursor:pointer}
+  .nb .mini{height:88px;position:relative;background:linear-gradient(#cdecff,#dff0c6)}
+  .nb .mini .g{position:absolute;bottom:0;left:0;right:0;height:44px;background:#8dc25f;border-radius:40% 40% 0 0}
+  .nb .mini .p{position:absolute;bottom:14px;font-size:18px}
+  .nb .info{padding:9px 11px}
+  .nb .info b{font-size:14px}
+  .nb .info span{font-family:'Gaegu';font-size:12px;color:var(--sub);display:block}
+  .nb .badge{position:absolute;top:8px;right:8px;background:#fff;border-radius:999px;font-size:11px;padding:2px 8px;font-family:'Gaegu';color:var(--accent-deep);box-shadow:var(--shadow)}
+  /* 락 */
+  .village.locked{position:relative}
+  .lockveil{position:absolute;inset:0;background:rgba(250,246,238,.72);backdrop-filter:blur(4px);
+    border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:5;text-align:center;padding:16px}
+  .lockveil p{font-family:'Gaegu';font-size:15px;color:var(--ink)}
+  .lockveil button{background:var(--accent);color:#fff;border:none;border-radius:14px;padding:10px 18px;font-family:'Jua';font-size:14px;cursor:pointer;box-shadow:0 4px 0 var(--accent-deep)}
+
+  /* ---- 도감 미리보기 ---- */
+  .dexrow{display:flex;gap:10px;flex-wrap:wrap}
+  .dex{width:calc(20% - 8px);aspect-ratio:1;border-radius:16px;background:var(--card);border:1px solid var(--line);
+    display:grid;place-items:center;font-size:22px;box-shadow:var(--shadow)}
+  .dex.lock{background:var(--soft);color:#c9c0ac;font-size:16px}
+
+  /* ---- 기분 범례 ---- */
+  .legend{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin-top:8px;box-shadow:var(--shadow)}
+  .legend .lg{font-family:'Gaegu';font-size:13px;color:var(--sub);margin-bottom:8px}
+  .legend .items{display:flex;flex-wrap:wrap;gap:8px}
+  .legend .it{display:flex;align-items:center;gap:5px;background:var(--soft);border-radius:999px;padding:5px 10px;font-size:13px}
+  .legend .it .hand{font-size:13px}
+
+  /* ---- 하단 탭 ---- */
+  .tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:414px;display:flex;
+    background:#fff;border-top:1px solid var(--line);z-index:40}
+  .tab{flex:1;text-align:center;padding:12px 0 20px;font-size:12px;color:var(--sub);cursor:pointer}
+  .tab .ic{font-size:20px;display:block;margin-bottom:2px;filter:grayscale(.4)}
+  .tab.on{color:var(--accent-deep)}
+  .tab.on .ic{filter:none}
+
+  /* ---- 모달 ---- */
+  .ov{position:fixed;inset:0;background:rgba(70,58,44,.4);z-index:60;display:none;align-items:flex-end;justify-content:center}
+  .ov.on{display:flex}
+  .sheet{width:100%;max-width:414px;background:var(--bg);border-radius:26px 26px 0 0;padding:20px 18px 30px;position:relative;max-height:88vh;overflow-y:auto}
+  .sheet::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:40px;height:4px;border-radius:2px;background:var(--line)}
+  .sheet .x{position:absolute;top:16px;right:18px;font-size:20px;color:var(--sub);cursor:pointer;background:none;border:none}
+
+  /* plant detail */
+  .pd .big{font-size:56px;text-align:center;margin:14px 0 6px}
+  .pd .day{text-align:center;font-family:'Gaegu';color:var(--sub);font-size:14px;margin-bottom:14px}
+  .pd .note{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;font-family:'Gaegu';font-size:17px;line-height:1.5;box-shadow:var(--shadow)}
+  .pd .photo{width:100%;height:180px;object-fit:cover;border-radius:16px;margin-bottom:12px;filter:saturate(.95)}
+
+  /* friend visit */
+  .fv .fgarden{height:170px;border-radius:20px;overflow:hidden;position:relative;margin:8px 0 14px;
+    background:linear-gradient(#cdecff,#dff0c6);box-shadow:var(--shadow)}
+  .fv .fgarden .g{position:absolute;bottom:0;left:0;right:0;height:70px;background:#8dc25f;border-radius:40% 40% 0 0}
+  .fv .fgarden .p{position:absolute;bottom:26px;font-size:26px}
+  .fv .fgarden .sign{position:absolute;font-size:14px;background:#fff;border-radius:8px;padding:2px 6px;font-family:'Gaegu';box-shadow:var(--shadow);white-space:nowrap}
+  .fv h3{font-size:18px;margin-bottom:4px}
+  .fv .signs{margin:6px 0 14px}
+  .fv .signrow{display:flex;gap:8px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
+  .fv .signrow .who{font-size:13px;color:var(--accent-deep)}
+  .fv .signrow .msg{font-family:'Gaegu';font-size:15px}
+  .fv .acts{display:flex;gap:10px}
+  .fv .water{flex:0 0 auto;background:var(--soft);border:none;border-radius:14px;padding:12px 16px;font-family:'Jua';font-size:14px;cursor:pointer}
+  .fv .noteIn{flex:1;display:flex;gap:8px}
+  .fv .noteIn input{flex:1;border:1px solid var(--line);border-radius:14px;padding:12px;font-family:'Gaegu';font-size:15px;outline:none;background:#fff}
+  .fv .noteIn button{background:var(--accent);color:#fff;border:none;border-radius:14px;padding:0 16px;font-family:'Jua';cursor:pointer}
+  .toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
+    padding:12px 20px;border-radius:999px;font-family:'Gaegu';font-size:15px;z-index:80;opacity:0;transition:.3s;pointer-events:none}
+  .toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="screen">
+    <div class="topbar">
+      <div class="title">내 정원<small>6일째 가꾸는 중</small></div>
+      <div class="season">🌸 <span>봄 · 맑음</span></div>
+    </div>
+
+    <!-- 정원 씬 -->
+    <div class="garden" id="garden">
+      <div class="sun"></div>
+      <div class="cloud c1"></div><div class="cloud c2"></div>
+      <div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div>
+      <div class="ground"></div>
+      <div class="path"></div>
+      <!-- 마스코트 -->
+      <div class="mascot"><div class="hood"></div><div class="face">
+        <div class="eye l"></div><div class="eye r"></div><div class="cheek l"></div><div class="cheek r"></div>
+      </div><div class="can">🪣</div></div>
+      <!-- 식물(=기록) 은 JS 로 배치 -->
+    </div>
+
+    <!-- 오늘 물주기 -->
+    <div class="today" id="todayCard">
+      <div class="drop">💧</div>
+      <div class="t"><b>오늘은 아직 안 심었어요</b><p>기록하면 오늘의 씨앗을 심을 수 있어요</p></div>
+      <button onclick="plantToday()">심기</button>
+    </div>
+
+    <!-- 이웃 마을 -->
+    <div class="sec"><h2>🏡 이웃 마을 · 개발자 스터디</h2></div>
+    <div class="village locked" id="village">
+      <div class="lockveil" id="lockveil">
+        <p>오늘 내 정원을 가꾸면<br>이웃 마을이 열려요</p>
+        <button onclick="plantToday()">오늘 심고 열기</button>
+      </div>
+      <!-- 이웃 카드 JS -->
+    </div>
+
+    <!-- 도감 -->
+    <div class="sec" style="margin-top:22px"><h2>🌼 발견 도감</h2><span class="more" onclick="openDex()">4 / 12 ›</span></div>
+    <div class="dexrow" id="dexrow"></div>
+
+    <!-- 기분 범례 -->
+    <div class="legend">
+      <div class="lg">오늘 기분에 따라 다른 식물이 심겨요</div>
+      <div class="items" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on"><span class="ic">🌱</span>정원</div>
+    <div class="tab"><span class="ic">📅</span>달력</div>
+    <div class="tab"><span class="ic">🏡</span>마을</div>
+    <div class="tab"><span class="ic">🙂</span>나</div>
+  </div>
+</div>
+
+<!-- plant detail -->
+<div class="ov" id="ov-pd" onclick="if(event.target===this)close('ov-pd')">
+  <div class="sheet pd" id="pd"></div>
+</div>
+<!-- friend visit -->
+<div class="ov" id="ov-fv" onclick="if(event.target===this)close('ov-fv')">
+  <div class="sheet fv" id="fv"></div>
+</div>
+<!-- dex -->
+<div class="ov" id="ov-dex" onclick="if(event.target===this)close('ov-dex')">
+  <div class="sheet" id="dex"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ---------- 기분 → 식물 매핑 (연관성의 핵심) ---------- */
+  const MOODS=[
+    {key:'joy',   e:'🌻', label:'기쁨'},
+    {key:'calm',  e:'🌿', label:'잔잔'},
+    {key:'flutter',e:'🌷',label:'설렘'},
+    {key:'tired', e:'🌵', label:'지침'},
+    {key:'proud', e:'🍅', label:'뿌듯'},
+    {key:'meh',   e:'🍀', label:'그냥'},
+  ];
+  const moodOf=k=>MOODS.find(m=>m.key===k);
+
+  /* ---------- 내 정원 = 최근 기록들 ---------- */
+  let myPlants=[
+    {day:1, mood:'calm',  note:'아침 러닝 5km. 날이 좋았다.', x:20, y:70, photo:'run1'},
+    {day:2, mood:'meh',   note:'밀린 책 두 챕터.',            x:70, y:66, photo:'book1'},
+    {day:4, mood:'proud', note:'파스타 직접 만들어 성공!',    x:44, y:80, photo:'pasta1'},
+    {day:5, mood:'joy',   note:'리팩터링 마무리, 개운하다.',  x:84, y:78, photo:'code1'},
+    {day:6, mood:'flutter',note:'하늘이 예뻐서 한참 봤다.',   x:12, y:82, photo:'sky1'},
+    {day:7, mood:'tired', note:'좀 지치는 하루였다.',         x:60, y:72, photo:''},
+    {day:8, mood:'calm',  note:'구석 카페, 오래 앉아 있었다.',x:32, y:64, photo:'cafe1'},
+  ];
+  let wateredToday=false;
+
+  function renderGarden(){
+    const g=document.getElementById('garden');
+    g.querySelectorAll('.plant').forEach(e=>e.remove());
+    myPlants.forEach((p,i)=>{
+      const el=document.createElement('div');
+      el.className='plant';
+      el.textContent=moodOf(p.mood).e;
+      el.style.left=p.x+'%'; el.style.bottom=(100-p.y)+'%';
+      el.style.animationDelay=(i*0.4)+'s';
+      el.onclick=()=>openPlant(p);
+      g.appendChild(el);
+    });
+    // 소소한 장식
+    ['🦋','🐞','🌼','🍄'].forEach((e,i)=>{
+      const d=document.createElement('div'); d.className='deco'; d.textContent=e;
+      d.style.left=[10,88,52,74][i]+'%'; d.style.bottom=[46,40,20,52][i]+'%';
+      g.appendChild(d);
+    });
+  }
+
+  /* ---------- 도감 ---------- */
+  const DEX=[
+    {e:'🌻',name:'해바라기',got:true, how:'기쁨 기록'},
+    {e:'🌿',name:'풀',    got:true, how:'잔잔한 날'},
+    {e:'🌷',name:'튤립',  got:true, how:'설레는 날'},
+    {e:'🦋',name:'나비',  got:true, how:'7일 연속'},
+    {e:'🐞',name:'무당벌레',got:false,how:'비 오는 날 기록'},
+    {e:'✨',name:'반딧불이',got:false,how:'밤 11시 후 기록'},
+    {e:'🍅',name:'토마토',got:false,how:'뿌듯한 날 5회'},
+    {e:'🐰',name:'토끼',  got:false,how:'주말 3번 기록'},
+    {e:'🌈',name:'무지개',got:false,how:'한 달 다 채우기'},
+    {e:'🦉',name:'부엉이',got:false,how:'밤 기록 10회'},
+    {e:'🌸',name:'벚꽃',  got:false,how:'봄 시즌 한정'},
+    {e:'⛄',name:'눈사람',got:false,how:'겨울 시즌 한정'},
+  ];
+  function renderDexPreview(){
+    document.getElementById('dexrow').innerHTML=
+      DEX.slice(0,5).map(d=>`<div class="dex ${d.got?'':'lock'}">${d.got?d.e:'🔒'}</div>`).join('');
+  }
+  function openDex(){
+    document.getElementById('dex').innerHTML=`<button class="x" onclick="close('ov-dex')">✕</button>
+      <h2 style="font-size:19px;margin:6px 0 4px">🌼 발견 도감</h2>
+      <p class="hand" style="color:var(--sub);margin-bottom:14px">${DEX.filter(d=>d.got).length} / ${DEX.length} 발견 · 조건을 채우면 새 친구가 놀러와요</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      ${DEX.map(d=>`<div style="background:${d.got?'#fff':'var(--soft)'};border:1px solid var(--line);border-radius:16px;padding:14px 8px;text-align:center;box-shadow:var(--shadow)">
+        <div style="font-size:30px">${d.got?d.e:'🔒'}</div>
+        <div style="font-size:13px;margin-top:4px;color:${d.got?'var(--ink)':'#c9c0ac'}">${d.got?d.name:'???'}</div>
+        <div class="hand" style="font-size:12px;color:var(--sub);margin-top:2px">${d.how}</div>
+      </div>`).join('')}</div>`;
+    document.getElementById('ov-dex').classList.add('on');
+  }
+
+  /* ---------- 기분 범례 ---------- */
+  document.getElementById('legend').innerHTML=
+    MOODS.map(m=>`<div class="it">${m.e}<span class="hand">${m.label}</span></div>`).join('');
+
+  /* ---------- 이웃 마을 ---------- */
+  const NEIGHBORS=[
+    {name:'철수', plants:['🌻','🍅','🌿'], today:true,  signs:[{who:'민수',msg:'오늘도 화이팅!'}]},
+    {name:'민수', plants:['🌷','🍀'],       today:true,  signs:[]},
+    {name:'태호', plants:['🌵','🌿','🌻'], today:false, signs:[{who:'철수',msg:'푹 쉬어~'}]},
+  ];
+  function renderVillage(){
+    const v=document.getElementById('village');
+    v.querySelectorAll('.nb').forEach(e=>e.remove());
+    NEIGHBORS.forEach((n,idx)=>{
+      const el=document.createElement('div'); el.className='nb'; el.onclick=()=>openFriend(idx);
+      el.innerHTML=`<div class="mini">${n.today?'<div class="badge">오늘 심음</div>':''}<div class="g"></div>
+        ${n.plants.map((p,i)=>`<span class="p" style="left:${16+i*30}px">${p}</span>`).join('')}</div>
+        <div class="info"><b>${n.name}의 정원</b><span>${n.today?'오늘 새 씨앗 🌱':'아직 조용해요'}</span></div>`;
+      v.appendChild(el);
+    });
+  }
+
+  function openFriend(idx){
+    const n=NEIGHBORS[idx];
+    document.getElementById('fv').innerHTML=`<button class="x" onclick="close('ov-fv')">✕</button>
+      <h3>${n.name}의 정원</h3>
+      <p class="hand" style="color:var(--sub)">놀러왔어요. 물을 주거나 팻말을 남겨보세요.</p>
+      <div class="fgarden"><div class="g"></div>
+        ${n.plants.map((p,i)=>`<span class="p" style="left:${28+i*68}px">${p}</span>`).join('')}
+        <span class="sign" style="left:60px;bottom:96px">${n.today?'오늘 새싹 🌱':'조용한 하루'}</span>
+      </div>
+      <div class="signs" id="signs">${renderSigns(n.signs)}</div>
+      <div class="acts">
+        <button class="water" onclick="water('${n.name}')">💧 물주기</button>
+        <div class="noteIn"><input id="noteInput" placeholder="한 줄 팻말 남기기…" maxlength="40">
+          <button onclick="postSign(${idx})">꽂기</button></div>
+      </div>`;
+    document.getElementById('ov-fv').classList.add('on');
+  }
+  function renderSigns(signs){
+    if(!signs.length) return `<div class="hand" style="color:var(--sub);font-size:14px;text-align:center;padding:6px">아직 팻말이 없어요. 처음으로 남겨보세요 🪧</div>`;
+    return signs.map(s=>`<div class="signrow">🪧<div><div class="who hand">${s.who}</div><div class="msg">${s.msg}</div></div></div>`).join('');
+  }
+  function postSign(idx){
+    const inp=document.getElementById('noteInput'); const v=inp.value.trim(); if(!v)return;
+    NEIGHBORS[idx].signs.push({who:'성현',msg:v});
+    document.getElementById('signs').innerHTML=renderSigns(NEIGHBORS[idx].signs);
+    inp.value=''; toast('팻말을 꽂았어요 🪧');
+  }
+  function water(name){ toast(`${name}의 정원에 물을 줬어요 💧`); }
+
+  /* ---------- 오늘 심기 (락 해제 데모) ---------- */
+  function plantToday(){
+    if(wateredToday) return;
+    wateredToday=true;
+    myPlants.push({day:9, mood:'joy', note:'오늘의 한 컷을 담았다.', x:52, y:76, photo:'new1'});
+    renderGarden();
+    // 오늘 카드 갱신
+    document.getElementById('todayCard').innerHTML=
+      `<div class="drop">🌻</div><div class="t"><b>오늘의 씨앗을 심었어요</b><p class="hand">기쁨 · 해바라기가 자라는 중</p></div>`;
+    // 이웃 마을 해제
+    document.getElementById('village').classList.remove('locked');
+    document.getElementById('lockveil').style.display='none';
+    document.querySelector('.topbar .title small').textContent='7일째 가꾸는 중';
+    toast('이웃 마을이 열렸어요 🏡');
+  }
+
+  /* ---------- plant detail ---------- */
+  function openPlant(p){
+    const m=moodOf(p.mood);
+    document.getElementById('pd').innerHTML=`<button class="x" onclick="close('ov-pd')">✕</button>
+      <div class="big">${m.e}</div>
+      <div class="day">8월 ${p.day}일 · ${m.label}</div>
+      ${p.photo?`<img class="photo" src="https://picsum.photos/seed/${p.photo}/500/320">`:''}
+      <div class="note">${p.note}</div>
+      <p class="hand" style="text-align:center;color:var(--sub);margin-top:12px">이 식물은 그날의 기록이에요</p>`;
+    document.getElementById('ov-pd').classList.add('on');
+  }
+
+  function close(id){ document.getElementById(id).classList.remove('on'); }
+  let tt;
+  function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on');
+    clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),1800); }
+
+  renderGarden(); renderVillage(); renderDexPreview();
+</script>
+</body>
+</html>

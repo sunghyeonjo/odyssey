@@ -33,6 +33,20 @@ data class VerifyCodeRequest(
     @field:NotBlank val code: String,
 )
 
+/**
+ * 비밀번호 재설정 코드 발송. 가입용 발송과 **조건이 반대**다 —
+ * 가입은 없는 주소여야 하고, 재설정은 있는 주소여야 한다.
+ */
+data class SendPasswordResetCodeRequest(
+    @field:NotBlank @field:Email val email: String,
+)
+
+data class ResetPasswordRequest(
+    @field:NotBlank @field:Email val email: String,
+    @field:NotBlank val code: String,
+    @field:NotBlank @field:Size(min = 8, max = 72) val newPassword: String,
+)
+
 data class AuthResponse(
     val accessToken: String,
     val refreshToken: String,

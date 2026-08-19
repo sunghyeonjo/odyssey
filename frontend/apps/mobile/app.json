@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Dayed",
+    "slug": "dayed",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "dayed",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.dayed.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.dayed.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "남기고 싶은 사진을 고르기 위해 사진첩을 사용합니다.",
+          "cameraPermission": "기록에 넣을 사진을 찍기 위해 카메라를 사용합니다.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "savePhotosPermission": "기록을 사진첩에 저장할 때 사용합니다.",
+          "isAccessMediaLocationEnabled": false
+        }
+      ],
+      "expo-dev-client"
+    ]
+  }
+}

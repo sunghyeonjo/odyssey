@@ -12,3 +12,4 @@ build/
 target/
 .gradle/
 .kotlin/
+.claude/

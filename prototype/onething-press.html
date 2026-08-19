@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneThing — 하루 한 페이지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f2ece0;      /* 종이 */
+    --paper2:#f6f1e7;
+    --ink:#26221c;        /* 잉크 */
+    --sub:#8c8272;        /* 흐린 잉크 */
+    --faint:#c3b9a3;      /* 아주 흐림 */
+    --line:#d9cfba;       /* 괘선 */
+    --seal:#9c3a30;       /* 낙관 붉은색 (아주 절제) */
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#e7dfce}
+  body{display:flex;justify-content:center;min-height:100vh;color:var(--ink);
+    font-family:'Nanum Myeongjo',serif;-webkit-font-smoothing:antialiased}
+  ::-webkit-scrollbar{width:0}
+  .lat{font-family:'EB Garamond',serif}
+  .caps{font-family:'EB Garamond',serif;letter-spacing:.34em;text-transform:uppercase}
+
+  .phone{position:relative;width:100%;max-width:414px;min-height:100vh;background:var(--paper);overflow:hidden;
+    box-shadow:0 0 70px rgba(0,0,0,.22)}
+  /* 종이 결 */
+  .phone::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:40;opacity:.05;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+  .screen{display:none;padding:34px 30px 108px;min-height:100vh}
+  .screen.on{display:block}
+
+  /* ── 제호(masthead) ── */
+  .mast{text-align:center;margin-bottom:30px}
+  .mast .brand{font-family:'EB Garamond',serif;letter-spacing:.5em;font-size:14px;padding-left:.5em}
+  .mast .rule{height:1px;background:var(--ink);margin:12px 0 8px;opacity:.75}
+  .mast .vol{font-family:'EB Garamond',serif;font-style:italic;font-size:14px;color:var(--sub);
+    display:flex;justify-content:space-between}
+  .mast .vol .l{cursor:pointer}
+
+  /* ── 오늘 페이지 ── */
+  .plate{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;
+    filter:grayscale(.18) contrast(1.03) sepia(.06) brightness(.99);border:1px solid var(--ink)}
+  .platewrap{padding:7px;border:1px solid var(--line);background:var(--paper2);margin-bottom:14px}
+  .platecap{text-align:center;font-family:'EB Garamond',serif;letter-spacing:.28em;font-size:10px;
+    text-transform:uppercase;color:var(--sub);margin-top:9px}
+  .date{text-align:center;font-family:'EB Garamond',serif;letter-spacing:.24em;font-size:11px;
+    text-transform:uppercase;color:var(--sub);margin:26px 0 16px}
+  .entry{font-size:23px;line-height:2;text-align:center;padding:0 6px;word-break:keep-all}
+  .entry .seal{display:block;width:22px;height:22px;border:1.5px solid var(--seal);color:var(--seal);
+    border-radius:3px;margin:22px auto 0;font-family:'EB Garamond';font-size:12px;line-height:20px;text-align:center}
+
+  /* 미인화(빈 페이지) */
+  .blank{text-align:center;padding:70px 10px 40px}
+  .blank .mk{font-family:'EB Garamond';font-style:italic;font-size:15px;color:var(--faint);letter-spacing:.05em}
+  .blank .q{font-size:20px;line-height:1.9;color:var(--sub);margin:20px 0 34px;word-break:keep-all}
+  .press{font-family:'EB Garamond',serif;letter-spacing:.3em;text-transform:uppercase;font-size:12px;
+    color:var(--ink);background:none;border:1px solid var(--ink);padding:14px 30px;cursor:pointer}
+  .press:hover{background:var(--ink);color:var(--paper)}
+
+  /* 페이지 하단 */
+  .pagefoot{display:flex;justify-content:space-between;align-items:center;margin-top:40px;
+    border-top:1px solid var(--line);padding-top:12px;
+    font-family:'EB Garamond',serif;letter-spacing:.2em;text-transform:uppercase;font-size:10px;color:var(--sub)}
+  .pagefoot span{cursor:pointer}
+
+  /* ── 색인(목차) ── */
+  .idxhead{text-align:center;margin-bottom:26px}
+  .idxhead .t{font-size:19px;letter-spacing:.3em}
+  .idxhead .s{font-family:'EB Garamond';font-style:italic;color:var(--sub);font-size:14px;margin-top:6px}
+  .idxrow{display:flex;align-items:baseline;gap:8px;padding:11px 0;cursor:pointer}
+  .idxrow .no{font-family:'EB Garamond';font-size:14px;color:var(--sub);width:26px;flex:0 0 26px}
+  .idxrow .ti{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .idxrow .dots{flex:1;border-bottom:1px dotted var(--line);transform:translateY(-3px)}
+  .idxrow .wd{font-family:'EB Garamond';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .idxrow.empty .ti,.idxrow.empty .no{color:var(--faint)}
+  .idxrow.today .ti{color:var(--seal)}
+
+  /* ── 합본(방) ── */
+  .co .plate{aspect-ratio:4/5}
+  .article{margin-bottom:34px}
+  .byline{font-family:'EB Garamond',serif;letter-spacing:.22em;text-transform:uppercase;font-size:10px;
+    color:var(--sub);margin:12px 0 8px;text-align:center}
+  .article .txt{font-size:18px;line-height:1.9;text-align:center;word-break:keep-all}
+  .article.locked .platewrap{position:relative}
+  .article.locked .plate{filter:grayscale(1) brightness(.72) blur(6px)}
+  .locknote{position:absolute;inset:7px;display:flex;align-items:center;justify-content:center;text-align:center;
+    background:rgba(242,236,224,.34)}
+  .locknote em{font-family:'EB Garamond';font-style:italic;font-size:15px;color:var(--ink)}
+  .colock{border:1px solid var(--line);padding:22px;text-align:center;margin-bottom:26px}
+  .colock em{font-family:'EB Garamond';font-style:italic;font-size:15px;color:var(--sub);display:block;margin-bottom:16px}
+
+  /* 멤버 표기 */
+  .contribs{text-align:center;font-family:'EB Garamond';font-style:italic;color:var(--sub);font-size:13px;margin-bottom:24px}
+
+  /* ── 나 ── */
+  .me{text-align:center;padding:20px 0 30px}
+  .me .n{font-size:30px;letter-spacing:.06em}
+  .me .s{font-family:'EB Garamond';font-style:italic;color:var(--sub);font-size:14px;margin-top:8px}
+  .setrow{border-top:1px solid var(--line);padding:16px 2px;font-size:14px;color:var(--sub);cursor:pointer;
+    display:flex;justify-content:space-between}
+  .setrow .lat{font-size:12px;color:var(--faint)}
+
+  /* ── 하단 항해 ── */
+  .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:414px;display:flex;
+    background:var(--paper);border-top:1px solid var(--ink);z-index:30}
+  .navi{flex:1;text-align:center;padding:16px 0 22px;cursor:pointer;
+    font-family:'EB Garamond',serif;letter-spacing:.22em;text-transform:uppercase;font-size:10px;color:var(--faint)}
+  .navi.on{color:var(--ink)}
+
+  /* ── 모달 ── */
+  .ov{position:fixed;inset:0;background:rgba(38,34,28,.5);z-index:60;display:none;align-items:flex-end;justify-content:center}
+  .ov.on{display:flex}
+  .sheet{width:100%;max-width:414px;background:var(--paper);max-height:92vh;overflow-y:auto;padding:30px 30px 40px;position:relative}
+  .sheet .x{position:absolute;top:18px;right:22px;background:none;border:none;font-family:'EB Garamond';
+    font-style:italic;font-size:16px;color:var(--sub);cursor:pointer}
+
+  /* compose */
+  .cmp h3{text-align:center;font-family:'EB Garamond';letter-spacing:.3em;text-transform:uppercase;font-size:12px;color:var(--sub);margin-bottom:24px}
+  .cmp .drop{width:100%;aspect-ratio:4/5;border:1px solid var(--line);background:var(--paper2);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;margin-bottom:18px}
+  .cmp .drop img{width:100%;height:100%;object-fit:cover;filter:grayscale(.18) sepia(.06)}
+  .cmp .drop em{font-family:'EB Garamond';font-style:italic;color:var(--faint);font-size:14px}
+  .cmp textarea{width:100%;min-height:80px;background:none;border:none;border-bottom:1px solid var(--line);
+    font-family:'Nanum Myeongjo',serif;font-size:19px;line-height:1.9;color:var(--ink);text-align:center;resize:none;outline:none;padding:8px}
+  .cmp textarea::placeholder{color:var(--faint)}
+  .cmp .foot{text-align:center;margin-top:28px}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ══ 오늘 ══ -->
+  <div class="screen on" id="s-today">
+    <div class="mast">
+      <div class="brand">ONETHING</div>
+      <div class="rule"></div>
+      <div class="vol"><span class="l" onclick="go('index')">索引</span><span class="lat" id="volno">vol.1 · no.09</span></div>
+    </div>
+    <div id="todaybody"></div>
+  </div>
+
+  <!-- ══ 색인 ══ -->
+  <div class="screen" id="s-index">
+    <div class="idxhead">
+      <div class="t caps">Index</div>
+      <div class="s">2026 · 8월</div>
+    </div>
+    <div id="idxlist"></div>
+  </div>
+
+  <!-- ══ 합본 ══ -->
+  <div class="screen co" id="s-co">
+    <div class="mast">
+      <div class="brand">개발자 스터디</div>
+      <div class="rule"></div>
+      <div class="vol"><span class="lat" style="font-style:normal;letter-spacing:.2em">합본</span><span class="lat">8월 9일 · 토</span></div>
+    </div>
+    <div class="contribs" id="contribs"></div>
+    <div id="cobody"></div>
+  </div>
+
+  <!-- ══ 나 ══ -->
+  <div class="screen" id="s-me">
+    <div class="me">
+      <div class="n">성현</div>
+      <div class="s">vol.1 · 42 pages bound</div>
+    </div>
+    <div class="setrow">이 책의 방 · 초대<span class="lat">rooms</span></div>
+    <div class="setrow">인화 시간 · 알림<span class="lat">daily</span></div>
+    <div class="setrow">제본 · 내보내기<span class="lat">export</span></div>
+    <div class="setrow">로그아웃<span class="lat">sign out</span></div>
+  </div>
+
+  <div class="nav">
+    <div class="navi on" data-s="today" onclick="go('today')">오늘</div>
+    <div class="navi" data-s="index" onclick="go('index')">索引</div>
+    <div class="navi" data-s="co" onclick="go('co')">합본</div>
+    <div class="navi" data-s="me" onclick="go('me')">나</div>
+  </div>
+</div>
+
+<!-- page view (색인/지난 페이지) -->
+<div class="ov" id="ov-page" onclick="if(event.target===this)close('ov-page')">
+  <div class="sheet" id="pageview"></div>
+</div>
+<!-- compose -->
+<div class="ov" id="ov-cmp" onclick="if(event.target===this)close('ov-cmp')">
+  <div class="sheet cmp" id="cmp">
+    <button class="x" onclick="close('ov-cmp')">닫기</button>
+    <h3>오늘을 인화하다</h3>
+    <div class="drop" id="drop" onclick="pickPhoto()"><em>사진 한 장</em></div>
+    <textarea id="cmptext" placeholder="오늘, 한 줄."></textarea>
+    <div class="foot"><button class="press" onclick="doPrint()">인화하기</button></div>
+  </div>
+</div>
+
+<script>
+  const YEAR=2026, MONTH=7, TODAY=9;
+  const WD=['일','월','화','수','목','금','토'];
+  const WDL=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const P=s=>`https://picsum.photos/seed/${s}/600/750`;
+
+  let entries={
+    1:{t:'아침 러닝 오 킬로미터. 날이 좋아 오래 걸었다.', p:'run1'},
+    2:{t:'밀린 책을 두 챕터 읽었다.', p:'book1'},
+    4:{t:'파스타를 직접 만들어 먹었다. 제법이었다.', p:'pasta1'},
+    5:{t:'오래 붙들던 리팩터링을 끝냈다.', p:'code1'},
+    6:{t:'하늘이 예뻐 한참을 올려다보았다.', p:'sky1'},
+    8:{t:'구석 카페에 오래 앉아 있었다.', p:'cafe1'},
+  };
+  let printedToday=false;
+  let draftPhoto='new1';
+
+  const wdOf=d=>new Date(YEAR,MONTH,d).getDay();
+  const pad=n=>String(n).padStart(2,'0');
+
+  /* ── 오늘 페이지 ── */
+  function renderToday(){
+    const e=entries[TODAY];
+    const body=document.getElementById('todaybody');
+    if(e){
+      body.innerHTML=`
+        <div class="platewrap"><img class="plate" src="${P(e.p)}"></div>
+        <div class="platecap">Plate ${pad(TODAY)}</div>
+        <div class="date">2026 · 8월 ${TODAY}일 · ${WD[wdOf(TODAY)]}요일</div>
+        <div class="entry">${e.t}<span class="seal">印</span></div>
+        <div class="pagefoot"><span onclick="go('index')">← 索引</span><span onclick="go('co')">합본 →</span></div>`;
+    }else{
+      body.innerHTML=`
+        <div class="blank">
+          <div class="mk">no.09 — 백지</div>
+          <div class="q">오늘은 아직<br>인화되지 않았습니다.</div>
+          <button class="press" onclick="openCmp()">인화하기</button>
+        </div>
+        <div class="pagefoot"><span onclick="go('index')">← 索引</span><span onclick="go('co')">합본 →</span></div>`;
+    }
+  }
+
+  /* ── 색인 ── */
+  function renderIndex(){
+    let html='';
+    const days=new Date(YEAR,MONTH+1,0).getDate();
+    for(let d=1;d<=days;d++){
+      const e=entries[d];
+      const cls=(d===TODAY?'today ':'')+(e?'':'empty');
+      const title=e?e.t:'—';
+      html+=`<div class="idxrow ${cls}" onclick="${e?`openPage(${d})`:''}">
+        <span class="no">${pad(d)}</span>
+        <span class="ti">${title}</span>
+        <span class="dots"></span>
+        <span class="wd">${WDL[wdOf(d)]}</span></div>`;
+    }
+    document.getElementById('idxlist').innerHTML=html;
+  }
+
+  /* ── 합본(방) ── */
+  const CO=[
+    {who:'성현', me:true,  t:'구석 카페에 오래 앉아 있었다.', p:'cafe1'},
+    {who:'철수', me:false, t:'오늘 배포를 마쳤다.', p:'deploy'},
+    {who:'민수', me:false, t:'새 앨범을 하루 종일 들었다.', p:'music'},
+  ];
+  function renderCo(){
+    document.getElementById('contribs').textContent =
+      `기고 — ${CO.map(c=>c.who).join(' · ')} · 태호(미인화)`;
+    const locked=!printedToday;
+    const body=document.getElementById('cobody');
+    if(locked){
+      body.innerHTML=`<div class="colock"><em>먼저 오늘을 인화하면<br>이 합본이 열립니다.</em>
+        <button class="press" onclick="openCmp()">인화하기</button></div>`+
+        CO.filter(c=>!c.me).map(c=>articleHTML(c,true)).join('');
+    }else{
+      body.innerHTML=CO.map(c=>articleHTML(c,false)).join('');
+    }
+  }
+  function articleHTML(c,locked){
+    return `<div class="article ${locked?'locked':''}">
+      <div class="platewrap"><img class="plate" src="${P(c.p)}">
+        ${locked?'<div class="locknote"><em>미인화</em></div>':''}</div>
+      <div class="byline">${c.me?'성현 · 나':c.who}</div>
+      ${locked?'':`<div class="txt">${c.t}</div>`}</div>`;
+  }
+
+  /* ── 지난 페이지 뷰 ── */
+  function openPage(d){
+    const e=entries[d]; if(!e)return;
+    document.getElementById('pageview').innerHTML=`<button class="x" onclick="close('ov-page')">닫기</button>
+      <div class="platewrap" style="margin-top:6px"><img class="plate" src="${P(e.p)}"></div>
+      <div class="platecap">Plate ${pad(d)}</div>
+      <div class="date">2026 · 8월 ${d}일 · ${WD[wdOf(d)]}요일</div>
+      <div class="entry">${e.t}<span class="seal">印</span></div>`;
+    document.getElementById('ov-page').classList.add('on');
+  }
+
+  /* ── 인화(작성) ── */
+  function openCmp(){ document.getElementById('drop').innerHTML=`<img src="${P(draftPhoto)}">`;
+    document.getElementById('ov-cmp').classList.add('on'); }
+  function pickPhoto(){ draftPhoto='new'+Math.floor(Math.random()*90+2);
+    document.getElementById('drop').innerHTML=`<img src="${P(draftPhoto)}">`; }
+  function doPrint(){
+    const t=document.getElementById('cmptext').value.trim()||'오늘의 한 페이지.';
+    entries[TODAY]={t, p:draftPhoto};
+    printedToday=true;
+    close('ov-cmp');
+    renderToday(); renderIndex(); renderCo();
+    go('today');
+  }
+
+  function go(s){
+    document.querySelectorAll('.screen').forEach(e=>e.classList.remove('on'));
+    document.getElementById('s-'+s).classList.add('on');
+    document.querySelectorAll('.navi').forEach(n=>n.classList.toggle('on',n.dataset.s===s));
+    window.scrollTo(0,0);
+  }
+  function close(id){ document.getElementById(id).classList.remove('on'); }
+
+  renderToday(); renderIndex(); renderCo();
+</script>
+</body>
+</html>

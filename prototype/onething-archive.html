@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OneThing — 홈 아카이브 방식 비교</title>
+<style>
+  :root{
+    --bg:#f1eadd; --surface:#fbf7ee; --ink:#3a352c; --sub:#8a8272;
+    --faint:#c9c0ac; --line:#e6ddca; --accent:#6f7d52; --soft:#e8ecdc;
+    --page:#efe9dd;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--page); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1400px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:-.4px}
+  .lede{color:var(--sub);font-size:14px;line-height:1.7;margin:0 0 28px;max-width:760px}
+
+  section{margin:0 0 36px}
+  h2{font-size:15px;margin:0 0 12px;letter-spacing:.4px;color:var(--ink)}
+  table{border-collapse:collapse;width:100%;max-width:900px;font-size:13px;background:var(--surface);border-radius:12px;overflow:hidden}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f6f0e4;font-weight:700;font-size:12px;color:var(--sub);letter-spacing:.3px}
+  tr:last-child td{border-bottom:0}
+
+  .decks{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:26px;align-items:start}
+  .deck{background:var(--surface);border-radius:20px;padding:18px;border:1px solid var(--line)}
+  .deck.base{opacity:.85}
+  .tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.8px;padding:4px 9px;border-radius:99px;background:var(--soft);color:var(--accent);margin-bottom:8px}
+  .tag.gray{background:#eee7d8;color:var(--sub)}
+  .deck h3{margin:0 0 4px;font-size:16px;letter-spacing:-.2px}
+  .ref{font-size:11px;color:var(--faint);margin:0 0 12px}
+  .notes{font-size:12px;line-height:1.65;color:var(--sub);margin:14px 0 0;padding:0;list-style:none}
+  .notes li{padding-left:14px;position:relative;margin-bottom:3px}
+  .notes li::before{content:'';position:absolute;left:3px;top:8px;width:4px;height:4px;border-radius:2px;background:var(--faint)}
+  .notes li.good::before{background:var(--accent)}
+  .notes li.bad::before{background:#c9564b}
+  .size{font-size:11px;color:var(--accent);font-weight:700;letter-spacing:.3px;margin-top:10px}
+
+  /* ── 폰 프레임 ── */
+  .phone{
+    width:100%;max-width:340px;height:600px;margin:0 auto;
+    background:var(--bg);border-radius:26px;border:1px solid var(--line);
+    overflow:hidden;position:relative;display:flex;flex-direction:column;
+  }
+  .phead{padding:14px 16px 8px;flex:none}
+  .pmonth{font-size:40px;font-weight:300;letter-spacing:-1.5px;line-height:1}
+  .pyear{font-size:10px;color:var(--sub);letter-spacing:1px;margin-left:5px}
+  .avatar{width:30px;height:30px;border-radius:15px;background:var(--accent);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  .prow{display:flex;align-items:flex-start;justify-content:space-between}
+  .scroll{flex:1;overflow-y:auto;overscroll-behavior:contain}
+  .scroll::-webkit-scrollbar{width:0}
+
+  /* ── 우표 ── */
+  .stamp{background:var(--surface);padding:6%;display:block;position:relative}
+  .stamp img{width:100%;height:100%;object-fit:cover;display:block;background:var(--line)}
+  .stamp .inner{position:absolute;inset:6%;overflow:hidden;background:var(--line)}
+  .daynum{font-size:10px;color:var(--ink);letter-spacing:.5px;margin-bottom:3px;font-variant-numeric:tabular-nums}
+  .daynum.faint{color:var(--faint)}
+
+  /* 현행 7열 */
+  .cal7{padding:0 16px 20px}
+  .wk{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+  .wkhead{font-size:9px;color:var(--faint);text-align:center;font-weight:700;padding:6px 0}
+  .cell{padding:2px 1px}
+  .cell .stamp{aspect-ratio:100/122}
+
+  /* 안 A — 3열 */
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 18px}
+  .g3 .stamp{aspect-ratio:100/122}
+  .mhead{position:sticky;top:0;z-index:2;background:linear-gradient(var(--bg) 70%,transparent);
+    padding:12px 16px 8px;font-size:11px;letter-spacing:1.4px;color:var(--sub);font-weight:700}
+
+  /* 안 B — 주간 하이라이트 */
+  .wcard{margin:0 16px 12px;background:var(--surface);border-radius:18px;padding:12px;display:flex;gap:12px;border:1px solid var(--line)}
+  .whero{width:112px;flex:none}
+  .whero .stamp{aspect-ratio:100/122}
+  .wmeta{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:9px}
+  .wlabel{font-size:12px;font-weight:700}
+  .wdots{display:flex;gap:5px}
+  .dot{width:15px;height:15px;border-radius:4px;background:#eae3d4;display:flex;align-items:center;justify-content:center;
+    font-size:7px;color:var(--faint)}
+  .dot.on{background:var(--accent)}
+  .dot.today{outline:1.5px solid var(--accent);outline-offset:1px}
+  .wsub{font-size:11px;color:var(--sub);line-height:1.5}
+
+  /* 안 C — 모자이크 */
+  .mos{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 16px 18px;grid-auto-flow:dense}
+  .mos .stamp{aspect-ratio:1}
+  .mos .big{grid-column:span 2;grid-row:span 2}
+  .mos .wide{grid-column:span 2}
+
+  /* 안 D — 2열 대형 */
+  .g2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:0 16px 18px}
+  .card2 .shot{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:4/5;background:var(--line)}
+  .card2 .shot img{width:100%;height:100%;object-fit:cover;display:block}
+  .chip{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.45);color:#fff;
+    font-size:9px;padding:3px 7px;border-radius:99px;letter-spacing:.3px}
+  .cap{font-size:11px;line-height:1.5;color:var(--ink);margin-top:7px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+  .hint{font-size:11px;color:var(--faint);text-align:center;padding:10px 0 2px;letter-spacing:.3px}
+  .rec{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;max-width:900px}
+  .rec p{margin:0 0 10px;font-size:13.5px;line-height:1.75}
+  .rec p:last-child{margin:0}
+  strong{color:var(--ink)}
+  code{background:#efe7d7;padding:1px 5px;border-radius:4px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>홈 아카이브 — 4가지 방안</h1>
+  <p class="lede">
+    문제: 한 달을 7열로 깔면 우표 한 칸이 <strong>~47px</strong>밖에 안 나와 사진이 안 읽힘.
+    열 수를 줄이지 않으면 크기는 절대 안 커짐. 아래 4안은 “요일 정렬을 얼마나 포기하고 사진을 얼마나 키울까”의 스펙트럼.
+    모든 안은 <strong>아래 끝 = 오늘</strong>, 위로 스크롤 = 과거. (열자마자 맨 아래로 내려가 있음)
+  </p>
+
+  <section>
+    <h2>레퍼런스가 푸는 방식</h2>
+    <table>
+      <tr><th>앱</th><th>방식</th><th>가져올 점</th></tr>
+      <tr><td>Apple Photos — Days</td><td>타일 크기를 불규칙하게 섞은 모자이크. 날짜 그룹 헤더</td><td>격자 느낌을 없애면서 밀도는 유지</td></tr>
+      <tr><td>Google Photos</td><td>고정 행높이 + 가변 폭, 날짜 sticky 헤더</td><td>월/주 sticky 헤더로 위치 감각 유지</td></tr>
+      <tr><td>Instagram 프로필</td><td>3열 균일 격자, 날짜 없음</td><td>3열이 “사진이 보이는” 최소 밀도</td></tr>
+      <tr><td>1 Second Everyday</td><td>달력형 초소형 타일 (같은 문제를 겪음)</td><td>반면교사 — 작으면 안 봄</td></tr>
+      <tr><td>Day One · Apple Journal</td><td>날짜별 큰 카드 세로 타임라인</td><td>우리 <code>FeedScreen</code>이 이미 담당</td></tr>
+      <tr><td>Gentler Streak · Retro</td><td>주 단위 요약 카드 + 미니 스트릭</td><td>달력 정보를 카드 한 줄로 압축</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>방안 비교</h2>
+    <div class="decks" id="decks"></div>
+  </section>
+
+  <section>
+    <h2>내 추천</h2>
+    <div class="rec">
+      <p><strong>안 B(주간 하이라이트) + 안 A(3열)의 조합</strong>을 제안해. 둘 중 하나만 고를 거면 <strong>안 A</strong>.</p>
+      <p>이유: 이 앱의 정체성은 “매일 남겼나”와 “그날 뭘 봤나” 두 가지인데, 한 화면에서 둘 다 크게 보여주는 건 물리적으로 불가능해.
+        안 B는 <strong>주 단위로 나눠서 둘 다</strong> 준다 — 큰 사진 한 장(그날 뭘 봤나) + 7칸 점(매일 남겼나).
+        스크롤도 주 단위라 리듬이 생기고, 요일 정렬을 버리지 않으면서 사진이 <strong>112px</strong>까지 커져.</p>
+      <p>안 A는 가장 안전한 선택. 인스타·구글포토가 3열로 수렴한 데는 이유가 있고, 우표가 <strong>108px</strong>이면 사진이 확실히 읽혀.
+        대신 “빈 날”이 사라져서 습관 앱의 압박/성취 요소는 약해짐.</p>
+      <p>안 C(모자이크)는 예쁘지만 <strong>하루 1장</strong> 구조에선 “왜 이 날만 크지?”에 답할 규칙이 없어서 자의적으로 보여.
+        안 D(2열)는 네가 처음 준 레퍼런스 그대로라 감성은 최고지만, 한 화면에 <strong>4일</strong>밖에 안 들어와서 아카이브보다 피드에 가까워 — 그건 이미 <code>FeedScreen</code>이 하고 있어서 역할이 겹쳐.</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ---------- 우표 톱니 마스크 ---------- */
+function stampPath(w,h,r,nx,ny){
+  const p=['M0 0'], arc=(x,y)=>`A${r} ${r} 0 0 0 ${x.toFixed(2)} ${y.toFixed(2)}`;
+  for(let i=0;i<nx;i++){const x=w*(i+.5)/nx;p.push(`L${(x-r).toFixed(2)} 0`,arc(x+r,0));} p.push(`L${w} 0`);
+  for(let j=0;j<ny;j++){const y=h*(j+.5)/ny;p.push(`L${w} ${(y-r).toFixed(2)}`,arc(w,y+r));} p.push(`L${w} ${h}`);
+  for(let i=nx-1;i>=0;i--){const x=w*(i+.5)/nx;p.push(`L${(x+r).toFixed(2)} ${h}`,arc(x-r,h));} p.push(`L0 ${h}`);
+  for(let j=ny-1;j>=0;j--){const y=h*(j+.5)/ny;p.push(`L0 ${(y+r).toFixed(2)}`,arc(0,y-r));}
+  p.push('Z'); return p.join(' ');
+}
+function maskUrl(w,h,r,nx,ny){
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><path d="${stampPath(w,h,r,nx,ny)}" fill="#000"/></svg>`;
+  return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+}
+const MASK_TALL = maskUrl(100,122,4.4,6,7);
+const MASK_SQ   = maskUrl(100,100,4.4,6,6);
+
+/* ---------- 데이터 (2026-08-09 이 오늘) ---------- */
+const TODAY = 9;
+const REC = {
+  '7/27':'seoul1','7/28':'cafe9','7/30':'book7','7/31':'road3',
+  '8/1':'hill2','8/2':'ramen4','8/4':'forest8','8/5':'desk5','8/6':'coffee2','8/7':'river6','8/9':'sky4'
+};
+const CAPS = {
+  '8/7':'한강변을 혼자 걸었다. 선선한 바람과 맑은 하늘.',
+  '8/6':'좋아하는 카페에서 오랜만에 여유로운 아침.',
+  '8/5':'책상 정리하고 나니 머리도 정리됨.',
+  '8/4':'숲길 산책. 공기가 달랐다.',
+  '8/2':'점심으로 만든 파스타.',
+  '8/1':'언덕 위에서 본 노을.'
+};
+const img = s => `https://picsum.photos/seed/${s}/300/380`;
+
+function stamp(seed, tall=true){
+  const m = tall?MASK_TALL:MASK_SQ;
+  return `<div class="stamp" style="-webkit-mask-image:${m};mask-image:${m};-webkit-mask-size:100% 100%;mask-size:100% 100%">
+    <div class="inner">${seed?`<img loading="lazy" src="${img(seed)}" alt="">`:''}</div>
+  </div>`;
+}
+
+/* ---------- 프레임 헤더 ---------- */
+const head = `<div class="phead"><div class="prow">
+  <div><span class="pmonth">08</span><span class="pyear">2026</span></div>
+  <div class="avatar">성</div>
+</div></div>`;
+
+/* ---------- 안별 본문 ---------- */
+// 현행 7열 (7월 마지막주 ~ 8월 2주)
+function view7(){
+  const days=['일','월','화','수','목','금','토'];
+  // 2026-08-01 은 토요일 기준으로 배치
+  const rows=[
+    [ '7/26','7/27','7/28','7/29','7/30','7/31','8/1' ],
+    [ '8/2','8/3','8/4','8/5','8/6','8/7','8/8' ],
+    [ '8/9',null,null,null,null,null,null ]
+  ];
+  let h=`<div class="cal7"><div class="wk">${days.map(d=>`<div class="wkhead">${d}</div>`).join('')}</div>`;
+  rows.forEach(r=>{
+    h+=`<div class="wk">`+r.map(k=>{
+      if(!k) return `<div class="cell"></div>`;
+      const n=k.split('/')[1], seed=REC[k];
+      return `<div class="cell"><div class="daynum ${seed?'':'faint'}">${n}</div>${seed?stamp(seed):`<div style="aspect-ratio:100/122"></div>`}</div>`;
+    }).join('')+`</div>`;
+  });
+  return h+`</div>`;
+}
+
+// 안 A — 3열, 빈 날 생략, 월 sticky 헤더
+function viewA(){
+  const jul=['7/27','7/28','7/30','7/31'];
+  const aug=['8/1','8/2','8/4','8/5','8/6','8/7','8/9'];
+  const g=list=>`<div class="g3">`+list.map(k=>{
+    const [m,d]=k.split('/');
+    return `<div><div class="daynum">${m}.${d}</div>${stamp(REC[k])}</div>`;
+  }).join('')+`</div>`;
+  return `<div class="mhead">2026 · 7월</div>${g(jul)}<div class="mhead">2026 · 8월</div>${g(aug)}`;
+}
+
+// 안 B — 주간 하이라이트 카드
+function viewB(){
+  const weeks=[
+    {label:'7월 5주', hero:'7/31', days:[null,'7/27','7/28',null,'7/30','7/31',null], sub:'4일 기록 · 7.26 – 8.1'},
+    {label:'8월 1주', hero:'8/7',  days:['8/2',null,'8/4','8/5','8/6','8/7',null],   sub:'5일 기록 · 8.2 – 8.8'},
+    {label:'이번 주', hero:'8/9',  days:['8/9',null,null,null,null,null,null],        sub:'1일 기록 · 오늘까지', now:0}
+  ];
+  const wd=['일','월','화','수','목','금','토'];
+  return weeks.map(w=>`
+    <div class="wcard">
+      <div class="whero">${stamp(REC[w.hero])}</div>
+      <div class="wmeta">
+        <div class="wlabel">${w.label}</div>
+        <div class="wdots">${w.days.map((d,i)=>
+          `<div class="dot ${d?'on':''} ${w.now===i?'today':''}">${d?'':wd[i]}</div>`).join('')}</div>
+        <div class="wsub">${w.sub}</div>
+      </div>
+    </div>`).join('') + `<div style="height:8px"></div>`;
+}
+
+// 안 C — 모자이크
+function viewC(){
+  const items=[
+    {k:'7/27'},{k:'7/28'},{k:'7/30',cls:'wide'},{k:'7/31'},
+    {k:'8/1'},{k:'8/2',cls:'big'},{k:'8/4'},{k:'8/5'},
+    {k:'8/6'},{k:'8/7',cls:'wide'},{k:'8/9',cls:'big'}
+  ];
+  return `<div class="mhead">2026 · 7–8월</div><div class="mos">`+
+    items.map(it=>`<div class="${it.cls||''}">${stamp(REC[it.k],false)}</div>`).join('')+`</div>`;
+}
+
+// 안 D — 2열 대형 + 캡션
+function viewD(){
+  const list=['7/30','7/31','8/1','8/2','8/4','8/5','8/6','8/7','8/9'];
+  return `<div class="mhead">2026 · 8월</div><div class="g2">`+
+    list.map(k=>{
+      const [m,d]=k.split('/');
+      return `<div class="card2">
+        <div class="shot"><img loading="lazy" src="${img(REC[k])}" alt=""><span class="chip">${m}월 ${d}일</span></div>
+        <div class="cap">${CAPS[k]||'오늘의 한 컷.'}</div>
+      </div>`;
+    }).join('')+`</div>`;
+}
+
+/* ---------- 렌더 ---------- */
+const DECKS=[
+  {base:true, tag:'현행', tagClass:'gray', title:'7열 월간 달력', ref:'지금 구현된 상태',
+   body:view7, size:'우표 ~47px',
+   notes:[['bad','사진이 안 읽힘 — 이번 요청의 원인'],['good','요일 정렬 · 빈 날이 그대로 보여 습관 압박이 강함'],['','한 화면에 한 달이 다 들어옴']]},
+
+  {tag:'안 A', title:'3열 아카이브', ref:'Instagram 프로필 · Google Photos',
+   body:viewA, size:'우표 ~108px  (2.3배)',
+   notes:[['good','사진이 확실히 읽힘. 가장 안전한 선택'],['good','월 sticky 헤더로 시간 감각 유지'],['bad','빈 날이 사라져 “못 남긴 날” 압박이 없어짐'],['','요일 정렬 포기']]},
+
+  {tag:'안 B', title:'주간 하이라이트', ref:'Gentler Streak · Retro',
+   body:viewB, size:'대표 사진 ~112px + 7칸 미니 스트릭',
+   notes:[['good','사진 크기와 요일 정렬을 <b>둘 다</b> 지킴'],['good','주 단위 리듬 — 스크롤이 “한 주씩” 넘어감'],['good','빈 날이 점으로 남아 습관 압박 유지'],['bad','한 주에 사진 1장만 대표로 — 나머지는 점으로만'],['','탭하면 그 주 전체를 펼치는 2단 구조 필요']]},
+
+  {tag:'안 C', title:'모자이크', ref:'Apple Photos — Days',
+   body:viewC, size:'타일 80 / 165px 혼합',
+   notes:[['good','격자 느낌이 없어 편집물처럼 보임'],['bad','<b>하루 1장</b> 구조라 “왜 이 날만 크지?”에 답할 규칙이 없음'],['bad','날짜를 눈으로 좇기 어려움']]},
+
+  {tag:'안 D', title:'2열 대형 + 캡션', ref:'네가 처음 준 Figma 레퍼런스',
+   body:viewD, size:'사진 ~160px  (3.4배)',
+   notes:[['good','감성·가독성 최고. 캡션까지 보임'],['bad','한 화면에 4일 — 아카이브라기엔 밀도가 너무 낮음'],['bad','<code>FeedScreen</code>과 역할이 겹침']]},
+];
+
+document.getElementById('decks').innerHTML = DECKS.map((d,i)=>`
+  <div class="deck ${d.base?'base':''}">
+    <span class="tag ${d.tagClass||''}">${d.tag}</span>
+    <h3>${d.title}</h3>
+    <p class="ref">${d.ref}</p>
+    <div class="phone">
+      ${head}
+      <div class="scroll" id="sc${i}">${d.body()}</div>
+      <div class="hint">↑ 위로 스크롤 = 과거 · 아래 끝 = 오늘</div>
+    </div>
+    <div class="size">${d.size}</div>
+    <ul class="notes">${d.notes.map(([c,t])=>`<li class="${c}">${t}</li>`).join('')}</ul>
+  </div>
+`).join('');
+
+// 아래 끝(오늘)에서 시작
+requestAnimationFrame(()=>{
+  DECKS.forEach((_,i)=>{
+    const el=document.getElementById('sc'+i);
+    if(el) el.scrollTop = el.scrollHeight;
+  });
+  setTimeout(()=>DECKS.forEach((_,i)=>{
+    const el=document.getElementById('sc'+i);
+    if(el) el.scrollTop = el.scrollHeight;
+  }), 900); // 이미지 로드 후 재보정
+});
+</script>
+</body>
+</html>
